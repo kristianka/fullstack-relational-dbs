@@ -3,14 +3,19 @@ const app = express()
 
 const { PORT } = require('./util/config')
 const { connectToDatabase } = require('./util/db')
+const errorHandler = require('./util/middlewares').errorHandler;
+const tokenExtractor = require('./util/middlewares').tokenExtractor;
 
 const blogsRouter = require('./controllers/blogs')
+const usersRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
 
 app.use(express.json())
 
-const errorHandler = require('./util/middlewares').errorHandler;
-
 app.use('/api/blogs', blogsRouter)
+app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
+
 app.use(errorHandler)
 
 const start = async () => {
