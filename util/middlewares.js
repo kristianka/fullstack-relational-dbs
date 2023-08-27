@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken')
 const errorHandler = (error, req, res, next) => {
-    console.error(error.message)
-    return res.status(400).json({ error })
+    console.error(error)
+    return res.status(400).json({ error: error.message })
 }
 
 const tokenExtractor = (req, res, next) => {
