@@ -1,7 +1,7 @@
 const router = require('express').Router()
 const { Blog } = require('../models')
 const { User } = require('../models')
-const { tokenExtractor } = require('../util/middlewares')
+const { tokenExtractor, checkAccountStatus } = require('../util/middlewares')
 const jwt = require('jsonwebtoken')
 const { Op } = require('sequelize')
 
@@ -33,18 +33,21 @@ router.get('/', async (req, res) => {
     res.json(blogs)
 })
 
-router.post('/', tokenExtractor, async (req, res, next) => {
+router.post('/', tokenExtractor, checkAccountStatus, async (req, res, next) => {
     try {
         const user = await User.findByPk(req.decodedToken.id)
+        if (!user) {
+            return res.status(401).json({ error: "unauthorized" })
+        }
+
         const blog = await Blog.create({ ...req.body, userId: user.id })
-        // Handle successful creation...      
         res.json(blog)
     } catch (error) {
         next(error)
     }
 })
 
-router.delete('/:id', tokenExtractor, async (req, res, next) => {
+router.delete('/:id', tokenExtractor, checkAccountStatus, async (req, res, next) => {
     try {
         const blog = await Blog.findByPk(req.params.id)
         if (!blog) {
